@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Trading</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+			font-family: 'Inter', sans-serif;
+			background: radial-gradient(circle at top, #111827 0%, #0b0f19 60%);
+			color: #e5e7eb;
+		}
+
+        .container {
+			max-width: 750px !important;
+			margin: 2rem auto;
+			padding: 2rem;
+			background: rgba(22, 29, 44, 0.95);
+			backdrop-filter: blur(12px);
+			border-radius: 1rem;
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			box-shadow: 
+				0 0 0 1px rgba(255,255,255,0.02),
+				0 20px 40px rgba(0, 0, 0, 0.6);
+		}
+        h1 {
+            color: #10b981;
+            font-size: 1.25rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        input, select {
+			padding: 0.6rem 0.75rem;
+			background-color: #111827;
+			color: #e5e7eb;
+			border: 1px solid #1f2937;
+			border-radius: 0.5rem;
+			font-size: 0.875rem;
+			transition: all 0.2s ease;
+		}
+        input:focus, select:focus {
+			outline: none;
+			border-color: #16a34a;
+			box-shadow: 0 0 0 1px #16a34a,
+						0 0 8px rgba(22, 163, 74, 0.25);
+		}
+        button {
+            background-color: #10b981;
+            color: white;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            grid-column: span 2;
+        }
+        button:hover {
+            background-color: #059669;
+        }
+        .results-section {
+            margin-top: 2rem;
+        }
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .filters .filter-group {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: #2d3748;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        thead {
+			background: linear-gradient(to right, #111827, #1f2937);
+		}
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #4a5568;
+            font-size: 0.875rem;
+        }
+        th {
+            font-weight: 700;
+            color: #cbd5e0;
+        }
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+		tbody tr:hover {
+			background-color: rgba(255,255,255,0.07);
+			transition: background 0.2s ease;
+		}
+        .positive {
+            color: #10b981;
+        }
+        .negative {
+            color: #ef4444;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .action-buttons button {
+            grid-column: auto;
+            width: fit-content;
+            padding: 0.5rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            text-align: right;
+        }
+        .edit-btn {
+            background-color: #2563eb;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.5rem;
+        }
+        .edit-btn:hover {
+            background-color: #1e40af;
+        }
+        .delete-btn {
+            background-color: #dc2626;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.5rem;
+        }
+        .delete-btn:hover {
+            background-color: #a01a1a;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 640px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+            button {
+                grid-column: span 1;
+            }
+            .filters {
+                flex-direction: column;
+            }
+        }
+        
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background-color: #2d3748;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .modal-buttons button {
+            grid-column: auto;
+            width: auto;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+		/* Animación entrada fila */
+		@keyframes fadeSlideIn {
+			from {
+				opacity: 0;
+				transform: translateY(-6px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.new-trade {
+			animation: fadeSlideIn 0.6s ease-out;
+		}
+
+		/* Flash verde */
+		.flash-profit {
+			animation: flashGreen 1s ease;
+		}
+
+		@keyframes flashGreen {
+			0% { background-color: rgba(34,197,94,0.25); }
+			100% { background-color: transparent; }
+		}
+
+		/* Flash rojo */
+		.flash-loss {
+			animation: flashRed 1s ease;
+		}
+
+		@keyframes flashRed {
+			0% { background-color: rgba(239,68,68,0.25); }
+			100% { background-color: transparent; }
+		}
+    </style>
+</head>
+<body class="bg-gray-800 p-4">
+
+    <div class="container ">
+        <h1 class="text-2xl font-bold text-green-500 mb-6 text-center">Operaciones Futuros</h1>
+
+        <!-- Formulario de Entrada -->
+        <form id="tradingForm" class="grid grid-cols-1 md:grid-cols-11 gap-3 items-end">
+
+			<!-- Fecha -->
+			<div class="form-group md:col-span-3">
+				<label class="text-s text-gray-400  text-center">Fecha</label>
+				<input type="date" id="date"
+					class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+					required>
+			</div>
+
+			<!-- Símbolo -->
+			<div class="form-group md:col-span-2">
+				<label class="text-s text-gray-400 text-center">Símbolo</label>
+				<input type="text" id="symbol"
+					class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm uppercase focus:border-green-500 focus:ring-1 focus:ring-green-500"
+					required>
+			</div>
+
+			<!-- Apalancamiento -->
+			<div class="form-group md:col-span-2">
+				<label class="text-s text-gray-400 text-center">Apalancamiento</label>
+				<div class="relative">
+					<span class="absolute left-3 top-2 text-gray-400 text-sm">x</span>
+					<input type="number" id="leverage" step="any"
+						class="w-full pl-6 bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+						required>
+				</div>
+			</div>
+
+			<!-- Tipo (Toggle estilo Binance) -->
+			<div class="form-group md:col-span-2">
+				<label class="text-s text-gray-400 text-center">Tipo</label>
+				<div class="flex bg-gray-800 border border-gray-600 rounded-md overflow-hidden">
+					<button type="button" id="longBtn"
+						class="flex-1 py-2 text-sm font-bold text-green-400 bg-green-900">
+						Long
+					</button>
+					<button type="button" id="shortBtn"
+						class="flex-1 py-2 text-sm font-bold text-red-400">
+						Short
+					</button>
+				</div>
+				<input type="hidden" id="type" required>
+			</div>
+
+			<!-- Profit -->
+			<div class="form-group md:col-span-2">
+				<label class="text-s text-gray-400 text-center">Profit</label>
+				<div class="relative">
+					<span class="absolute left-3 top-2 text-gray-400 text-sm">$</span>
+					<input type="number" id="profit" step="any"
+						class="w-full pl-6 bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+						required>
+				</div>
+			</div>
+
+			<!-- Botón -->
+			<div class="md:col-span-11">
+				<button type="submit" id="submitBtn"
+					class="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition duration-200">
+					Guardar Operación
+				</button>
+			</div>
+
+		</form>
+
+
+        <!-- Sección de Resultados y Filtros -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold text-gray-100 mb-4 text-center">Historial</h2>
+            
+            <div class="flex flex-col md:flex-row items-center gap-4 mb-4">
+                <div class="flex-1 w-full text-center">
+                    <label for="filterDateStart" class="text-s text-gray-400 text-center">Fecha Inicio</label>
+                    <input type="date" id="filterDateStart" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
+                </div>
+                <div class="flex-1 w-full text-center">
+                    <label for="filterDateEnd" class="text-s text-gray-400 text-center">Fecha Fin</label>
+                    <input type="date" id="filterDateEnd" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
+                </div>
+                <div class="flex-1 w-full text-center">
+                    <label for="filterSymbol" class="text-s text-gray-400 text-center">Símbolo</label>
+                    <input type="text" id="filterSymbol" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm uppercase focus:border-green-500 focus:ring-1 focus:ring-green-500">
+                </div>
+                <div class="flex-1 w-full text-center">
+                    <label class="block text-sm font-medium text-gray-200 md:text-gray-700">ㅤ</label>
+                    <button onclick="applyFilters()" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg  transition duration-300">
+                        Aplicar Filtros
+                    </button>
+                </div>    
+            </div>
+            
+
+            <div id="resultsTableContainer" class="mt-4 overflow-x-auto">
+                <table id="tradingTable" class="min-w-full divide-y divide-gray-600">
+                    <thead class="bg-gray-600 gap-1">
+                        <tr>
+                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Símbolo</th>
+                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Apalancamiento</th>
+							<th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Tipo</th>
+                            <th class="px-3 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Profit ($)</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-gray-800 divide-y divide-gray-700">
+                        <!-- Las filas de datos se insertarán aquí con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="totalProfitContainer" class="mt-4 text-right font-bold text-lg">
+                <!-- El total se mostrará aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmación para eliminar -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal">
+            <h3 class="text-xl font-bold mb-4">Confirmar Eliminación</h3>
+            <p>¿Estás seguro de que deseas eliminar esta operación?</p>
+            <div class="modal-buttons">
+                <button id="confirmDeleteBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-300">Eliminar</button>
+                <button id="cancelDeleteBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg transition duration-300">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+			const longBtn = document.getElementById('longBtn');
+			const shortBtn = document.getElementById('shortBtn');
+			const typeInput = document.getElementById('type');
+
+			// Selección por defecto
+			typeInput.value = 'Long';
+
+			longBtn.addEventListener('click', () => {
+				typeInput.value = 'Long';
+
+				longBtn.className = "flex-1 py-2 text-sm font-bold text-green-400 bg-green-900 shadow-[0_0_10px_rgba(34,197,94,0.4)]";
+				shortBtn.className = "flex-1 py-2 text-sm font-bold text-red-400";
+			});
+
+			shortBtn.addEventListener('click', () => {
+				typeInput.value = 'Short';
+
+				shortBtn.className = "flex-1 py-2 text-sm font-bold text-red-400 bg-red-900 shadow-[0_0_10px_rgba(239,68,68,0.4)]";
+				longBtn.className = "flex-1 py-2 text-sm font-bold text-green-400";
+			});
+		
+            const tradingForm = document.getElementById('tradingForm');
+            const tableBody = document.getElementById('tableBody');
+            const filterDateStartInput = document.getElementById('filterDateStart');
+            const filterDateEndInput = document.getElementById('filterDateEnd');
+            const filterSymbolInput = document.getElementById('filterSymbol');
+            const totalProfitContainer = document.getElementById('totalProfitContainer');
+            const submitBtn = document.getElementById('submitBtn');
+            const deleteModal = document.getElementById('deleteModal');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+            let trades = [];
+            let editingIndex = -1;
+            let tradeToDeleteIndex = -1;
+
+            // Función para obtener la fecha de hoy en formato YYYY-MM-DD
+            function getTodayDate() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // Cargar datos desde localStorage al iniciar la aplicación
+            function loadTrades() {
+                try {
+                    const storedTrades = localStorage.getItem('trading_data');
+                    if (storedTrades) {
+                        trades = JSON.parse(storedTrades);
+                        if (!Array.isArray(trades)) {
+                            trades = []; // Reset if data is not an array
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error al cargar los datos desde localStorage:", e);
+                    trades = [];
+                }
+                // Ordenar los datos por fecha en forma descendente al cargar
+                trades.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            // Guardar datos en localStorage
+            function saveTrades() {
+                localStorage.setItem('trading_data', JSON.stringify(trades));
+            }
+
+            // Establecer la fecha inicial al cargar la página
+            loadTrades();
+            tradingForm.date.value = getTodayDate();
+            renderTable(trades);
+
+            function renderTable(dataToRender) {
+                tableBody.innerHTML = '';
+                if (dataToRender.length === 0) {
+                    const noDataRow = document.createElement('tr');
+                    noDataRow.innerHTML = '<td colspan="6" class="text-center py-4 text-gray-400">No hay datos para mostrar.</td>';
+                    tableBody.appendChild(noDataRow);
+                    totalProfitContainer.innerHTML = '<span class="text-gray-400">Profit Total: $0.00</span>';
+                    return;
+                }
+                
+                let totalProfit = 0;
+				let monthlyStats = {};
+				let longProfit = 0;
+				let shortProfit = 0;
+				let longCount = 0;
+				let shortCount = 0;
+				let longWins = 0;
+				let shortWins = 0;
+                dataToRender.forEach((trade, index) => {
+                    totalProfit += trade.profit;
+					// Obtener año-mes
+					const monthKey = trade.date.substring(0, 7); // YYYY-MM
+
+					if (!monthlyStats[monthKey]) {
+						monthlyStats[monthKey] = {
+							profit: 0,
+							count: 0
+						};
+					}
+
+					monthlyStats[monthKey].profit += trade.profit;
+					monthlyStats[monthKey].count++;
+					//
+					if (trade.type === 'Long') {
+						longProfit += trade.profit;
+						longCount++;
+						if (trade.profit > 0) longWins++;
+					} else if (trade.type === 'Short') {
+						shortProfit += trade.profit;
+						shortCount++;
+						if (trade.profit > 0) shortWins++;
+					}
+                    const row = document.createElement('tr');
+					row.classList.add('new-trade');
+                    const profitClass = trade.profit >= 0 ? 'text-green-400' : 'text-red-400';
+					const typeBadge = trade.type === 'Long'
+						? '<span class="px-2 py-1 text-xs font-bold rounded-md bg-green-950 text-green-400">Long</span>'
+						: '<span class="px-2 py-1 text-xs font-bold rounded-md bg-red-950 text-red-400">Short</span>';
+
+                    row.innerHTML = `
+                        <td class="px-4 py-1 text-center whitespace-nowrap">${trade.date}</td>
+                        <td class="px-4 py-1 text-center whitespace-nowrap font-bold">${trade.symbol}</td>
+                        <td class="px-4 py-1 text-center whitespace-nowrap">x${trade.leverage}</td>
+						<td class="px-4 py-1 text-center whitespace-nowrap">${typeBadge}</td>
+                        <td class="px-4 py-1 text-right whitespace-nowrap ${profitClass}">${trade.profit.toFixed(2)}</td>
+                        <td class="px-4 py-1 text-right whitespace-nowrap action-buttons">
+                            <button class="edit-btn py-0 px-4 text-white bg-blue-700 rounded-md" onclick="editTrade(${index})">Editar</button>
+                            <button class="delete-btn py-0 px-4 text-white bg-red-700 rounded-md" onclick="showDeleteModal(${index})">Eliminar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+					if (trade.profit > 0) {
+						row.classList.add('flash-profit');
+					} else if (trade.profit < 0) {
+						row.classList.add('flash-loss');
+					}
+                });
+
+                const totalClass = totalProfit >= 0 ? 'text-green-400' : 'text-red-400';
+				const longWinRate = longCount ? ((longWins / longCount) * 100).toFixed(1) : 0;
+				const shortWinRate = shortCount ? ((shortWins / shortCount) * 100).toFixed(1) : 0;
+				const avgProfit = dataToRender.length ? (totalProfit / dataToRender.length).toFixed(2) : 0;
+				
+				const longProfitColor = longProfit >= 0 ? 'text-green-400' : 'text-red-400';
+				const shortProfitColor = shortProfit >= 0 ? 'text-green-400' : 'text-red-400';
+				
+				let monthlyHTML = '';
+
+				Object.keys(monthlyStats)
+					.sort((a, b) => new Date(b) - new Date(a))
+					.forEach(month => {
+
+						const profit = monthlyStats[month].profit;
+						const count = monthlyStats[month].count;
+						const avg = (profit / count).toFixed(2);
+						const profitColor = profit >= 0 ? 'text-green-400' : 'text-red-400';
+
+						monthlyHTML += `
+							<div class="p-3 bg-gray-800 rounded-lg">
+								<div class="font-bold text-gray-300 text-sm">${month}</div>
+								<div class="${profitColor}">Profit: $${profit.toFixed(2)}</div>
+								<div>Trades: ${count}</div>
+								<div>Promedio: $${avg}</div>
+							</div>
+						`;
+					});
+
+                totalProfitContainer.innerHTML = `
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+
+						<div class="p-4 bg-gray-800 rounded-lg">
+							<div class="font-bold ${totalClass} text-lg">
+								Profit Total: $${totalProfit.toFixed(2)}
+							</div>
+							<div>Trades Totales: ${dataToRender.length}</div>
+							<div>Profit Prom. por Trade: $${avgProfit}</div>
+						</div>
+
+						<div class="p-3 bg-green-950 rounded-lg">
+							<div class="font-bold text-green-400 text-sm">Long</div>
+							<div class="${longProfitColor}">Profit: $${longProfit.toFixed(2)}</div>
+							<div>Operaciones: ${longCount}</div>
+							<div>Win Rate: ${longWinRate}%</div>
+						</div>
+
+						<div class="p-3 bg-red-950 rounded-lg">
+							<div class="font-bold text-red-400 text-sm">Short</div>
+							<div class="${shortProfitColor}">Profit: $${shortProfit.toFixed(2)}</div>
+							<div>Operaciones: ${shortCount}</div>
+							<div>Win Rate: ${shortWinRate}%</div>
+						</div>
+
+					</div>
+					<!-- Estadísticas Mensuales -->
+					<div>
+						<h3 class="text-lg font-bold text-gray-200 mb-2 text-center"><br>Estadísticas Mensuales</h3>
+						<div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+							${monthlyHTML || '<div class="text-gray-400">No hay datos mensuales.</div>'}
+						</div>
+					</div>
+					`;
+            }
+
+            tradingForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const tradeData = {
+                    date: tradingForm.date.value,
+                    symbol: tradingForm.symbol.value.toUpperCase(),
+                    leverage: parseFloat(tradingForm.leverage.value),
+					type: tradingForm.type.value,
+                    profit: parseFloat(tradingForm.profit.value)
+                };
+
+                const lastDate = tradingForm.date.value;
+
+                if (editingIndex === -1) {
+                    trades.push(tradeData);
+                } else {
+                    trades[editingIndex] = tradeData;
+                    editingIndex = -1;
+                    submitBtn.textContent = 'Guardar Operación';
+                    submitBtn.classList.remove('bg-blue-700', 'hover:bg-blue-800');
+                    submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                }
+                
+                trades.sort((a, b) => new Date(b.date) - new Date(a.date));
+                saveTrades();
+                tradingForm.reset();
+                tradingForm.date.value = lastDate;
+                renderTable(trades);
+            });
+
+            window.editTrade = function(index) {
+                editingIndex = index;
+                const tradeToEdit = trades[index];
+                tradingForm.date.value = tradeToEdit.date;
+                tradingForm.symbol.value = tradeToEdit.symbol;
+                tradingForm.leverage.value = tradeToEdit.leverage;
+				tradingForm.type.value = tradeToEdit.type;
+                tradingForm.profit.value = tradeToEdit.profit;
+				
+				if (tradeToEdit.type === 'Long') {
+					longBtn.click();
+				} else {
+					shortBtn.click();
+				}
+				
+                submitBtn.textContent = 'Actualizar';
+                submitBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                submitBtn.classList.add('bg-blue-700', 'hover:bg-blue-800');
+            };
+
+            // Funciones para el modal de eliminación
+            window.showDeleteModal = function(index) {
+                tradeToDeleteIndex = index;
+                deleteModal.style.display = 'flex';
+            };
+
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteModal.style.display = 'none';
+                tradeToDeleteIndex = -1;
+            });
+
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (tradeToDeleteIndex !== -1) {
+                    trades.splice(tradeToDeleteIndex, 1);
+                    saveTrades();
+                    renderTable(trades);
+                    deleteModal.style.display = 'none';
+                    tradeToDeleteIndex = -1;
+                }
+            });
+
+            window.applyFilters = function() {
+                const startDate = filterDateStartInput.value ? new Date(filterDateStartInput.value + 'T00:00:00') : null;
+                const endDate = filterDateEndInput.value ? new Date(filterDateEndInput.value + 'T23:59:59') : null;
+                const symbol = filterSymbolInput.value.toUpperCase();
+
+                const filteredTrades = trades.filter(trade => {
+                    const tradeDate = new Date(trade.date + 'T00:00:00');
+                    const dateMatch = (!startDate || tradeDate >= startDate) && (!endDate || tradeDate <= endDate);
+                    const symbolMatch = !symbol || trade.symbol.includes(symbol);
+                    return dateMatch && symbolMatch;
+                });
+                renderTable(filteredTrades);
+            };
+
+        });
+    </script>
+</body>
+</html>
