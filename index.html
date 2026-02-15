@@ -240,142 +240,217 @@
 			0% { background-color: rgba(239,68,68,0.25); }
 			100% { background-color: transparent; }
 		}
+
+		#login-screen {
+			height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background: #0b0e11;
+		}
+		
+		.login-box {
+			background: #181a20;
+			padding: 40px;
+			border-radius: 12px;
+			text-align: center;
+			box-shadow: 0 0 20px rgba(0,0,0,0.5);
+		}
+		
+		.login-box h2 {
+			color: #f0b90b;
+			margin-bottom: 20px;
+		}
+		
+		.login-box input {
+			padding: 10px;
+			width: 200px;
+			margin-bottom: 10px;
+			border: none;
+			border-radius: 6px;
+		}
+		
+		.login-box button {
+			background: #f0b90b;
+			border: none;
+			padding: 10px 20px;
+			cursor: pointer;
+			border-radius: 6px;
+			font-weight: bold;
+		}
     </style>
 </head>
+
+<script>
+  const correctPassword = "130321"; // CAMBIÁ ESTO
+
+  function checkPassword() {
+    const input = document.getElementById("password").value;
+    const error = document.getElementById("error");
+
+    if (input === correctPassword) {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+      localStorage.setItem("authenticated", "true");
+    } else {
+      error.textContent = "Contraseña incorrecta";
+    }
+  }
+
+  window.onload = function() {
+    if (localStorage.getItem("authenticated") === "true") {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+    }
+  }
+</script>
+
 <body class="bg-gray-800 p-4">
 
-    <div class="container ">
-        <h1 class="text-2xl font-bold text-green-500 mb-6 text-center">Operaciones Futuros</h1>
+	<div id="login-screen">
+		<div class="login-box">
+			<h2>Acceso privado</h2>
+			<input type="password" id="password" placeholder="Ingrese contraseña">
+			<button onclick="checkPassword()">Entrar</button>
+			<p id="error" style="color:red;"></p>
+		</div>
+	</div>
 
-        <!-- Formulario de Entrada -->
-        <form id="tradingForm" class="grid grid-cols-1 md:grid-cols-11 gap-3 items-end">
-
-			<!-- Fecha -->
-			<div class="form-group md:col-span-3">
-				<label class="text-s text-gray-400  text-center">Fecha</label>
-				<input type="date" id="date"
-					class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
-					required>
-			</div>
-
-			<!-- Símbolo -->
-			<div class="form-group md:col-span-2">
-				<label class="text-s text-gray-400 text-center">Símbolo</label>
-				<input type="text" id="symbol"
-					class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm uppercase focus:border-green-500 focus:ring-1 focus:ring-green-500"
-					required>
-			</div>
-
-			<!-- Apalancamiento -->
-			<div class="form-group md:col-span-2">
-				<label class="text-s text-gray-400 text-center">Apalancamiento</label>
-				<div class="relative">
-					<span class="absolute left-3 top-2 text-gray-400 text-sm">x</span>
-					<input type="number" id="leverage" step="any"
-						class="w-full pl-6 bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+	<div id="main-content" style="display:none;">
+	    <div class="container ">
+	        <h1 class="text-2xl font-bold text-green-500 mb-6 text-center">Operaciones Futuros</h1>
+	
+	        <!-- Formulario de Entrada -->
+	        <form id="tradingForm" class="grid grid-cols-1 md:grid-cols-11 gap-3 items-end">
+	
+				<!-- Fecha -->
+				<div class="form-group md:col-span-3">
+					<label class="text-s text-gray-400  text-center">Fecha</label>
+					<input type="date" id="date"
+						class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
 						required>
 				</div>
-			</div>
-
-			<!-- Tipo (Toggle estilo Binance) -->
-			<div class="form-group md:col-span-2">
-				<label class="text-s text-gray-400 text-center">Tipo</label>
-				<div class="flex bg-gray-800 border border-gray-600 rounded-md overflow-hidden">
-					<button type="button" id="longBtn"
-						class="flex-1 py-2 text-sm font-bold text-green-400 bg-green-900">
-						Long
-					</button>
-					<button type="button" id="shortBtn"
-						class="flex-1 py-2 text-sm font-bold text-red-400">
-						Short
-					</button>
-				</div>
-				<input type="hidden" id="type" required>
-			</div>
-
-			<!-- Profit -->
-			<div class="form-group md:col-span-2">
-				<label class="text-s text-gray-400 text-center">Profit</label>
-				<div class="relative">
-					<span class="absolute left-3 top-2 text-gray-400 text-sm">$</span>
-					<input type="number" id="profit" step="any"
-						class="w-full pl-6 bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+	
+				<!-- Símbolo -->
+				<div class="form-group md:col-span-2">
+					<label class="text-s text-gray-400 text-center">Símbolo</label>
+					<input type="text" id="symbol"
+						class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm uppercase focus:border-green-500 focus:ring-1 focus:ring-green-500"
 						required>
 				</div>
-			</div>
-
-			<!-- Botón -->
-			<div class="md:col-span-11">
-				<button type="submit" id="submitBtn"
-					class="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition duration-200">
-					Guardar Operación
-				</button>
-			</div>
-
-		</form>
-
-
-        <!-- Sección de Resultados y Filtros -->
-        <div class="mt-8">
-            <h2 class="text-2xl font-bold text-gray-100 mb-4 text-center">Historial</h2>
-            
-            <div class="flex flex-col md:flex-row items-center gap-4 mb-4">
-                <div class="flex-1 w-full text-center">
-                    <label for="filterDateStart" class="text-s text-gray-400 text-center">Fecha Inicio</label>
-                    <input type="date" id="filterDateStart" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
-                </div>
-                <div class="flex-1 w-full text-center">
-                    <label for="filterDateEnd" class="text-s text-gray-400 text-center">Fecha Fin</label>
-                    <input type="date" id="filterDateEnd" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
-                </div>
-                <div class="flex-1 w-full text-center">
-                    <label for="filterSymbol" class="text-s text-gray-400 text-center">Símbolo</label>
-                    <input type="text" id="filterSymbol" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm uppercase focus:border-green-500 focus:ring-1 focus:ring-green-500">
-                </div>
-                <div class="flex-1 w-full text-center">
-                    <label class="block text-sm font-medium text-gray-200 md:text-gray-700">ㅤ</label>
-                    <button onclick="applyFilters()" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg  transition duration-300">
-                        Aplicar Filtros
-                    </button>
-                </div>    
-            </div>
-            
-
-            <div id="resultsTableContainer" class="mt-4 overflow-x-auto">
-                <table id="tradingTable" class="min-w-full divide-y divide-gray-600">
-                    <thead class="bg-gray-600 gap-1">
-                        <tr>
-                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Símbolo</th>
-                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Apalancamiento</th>
-							<th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Tipo</th>
-                            <th class="px-3 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Profit ($)</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="bg-gray-800 divide-y divide-gray-700">
-                        <!-- Las filas de datos se insertarán aquí con JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            <div id="totalProfitContainer" class="mt-4 text-right font-bold text-lg">
-                <!-- El total se mostrará aquí -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal de confirmación para eliminar -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="modal">
-            <h3 class="text-xl font-bold mb-4">Confirmar Eliminación</h3>
-            <p>¿Estás seguro de que deseas eliminar esta operación?</p>
-            <div class="modal-buttons">
-                <button id="confirmDeleteBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-300">Eliminar</button>
-                <button id="cancelDeleteBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg transition duration-300">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
+	
+				<!-- Apalancamiento -->
+				<div class="form-group md:col-span-2">
+					<label class="text-s text-gray-400 text-center">Apalancamiento</label>
+					<div class="relative">
+						<span class="absolute left-3 top-2 text-gray-400 text-sm">x</span>
+						<input type="number" id="leverage" step="any"
+							class="w-full pl-6 bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+							required>
+					</div>
+				</div>
+	
+				<!-- Tipo (Toggle estilo Binance) -->
+				<div class="form-group md:col-span-2">
+					<label class="text-s text-gray-400 text-center">Tipo</label>
+					<div class="flex bg-gray-800 border border-gray-600 rounded-md overflow-hidden">
+						<button type="button" id="longBtn"
+							class="flex-1 py-2 text-sm font-bold text-green-400 bg-green-900">
+							Long
+						</button>
+						<button type="button" id="shortBtn"
+							class="flex-1 py-2 text-sm font-bold text-red-400">
+							Short
+						</button>
+					</div>
+					<input type="hidden" id="type" required>
+				</div>
+	
+				<!-- Profit -->
+				<div class="form-group md:col-span-2">
+					<label class="text-s text-gray-400 text-center">Profit</label>
+					<div class="relative">
+						<span class="absolute left-3 top-2 text-gray-400 text-sm">$</span>
+						<input type="number" id="profit" step="any"
+							class="w-full pl-6 bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+							required>
+					</div>
+				</div>
+	
+				<!-- Botón -->
+				<div class="md:col-span-11">
+					<button type="submit" id="submitBtn"
+						class="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition duration-200">
+						Guardar Operación
+					</button>
+				</div>
+	
+			</form>
+	
+	
+	        <!-- Sección de Resultados y Filtros -->
+	        <div class="mt-8">
+	            <h2 class="text-2xl font-bold text-gray-100 mb-4 text-center">Historial</h2>
+	            
+	            <div class="flex flex-col md:flex-row items-center gap-4 mb-4">
+	                <div class="flex-1 w-full text-center">
+	                    <label for="filterDateStart" class="text-s text-gray-400 text-center">Fecha Inicio</label>
+	                    <input type="date" id="filterDateStart" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
+	                </div>
+	                <div class="flex-1 w-full text-center">
+	                    <label for="filterDateEnd" class="text-s text-gray-400 text-center">Fecha Fin</label>
+	                    <input type="date" id="filterDateEnd" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
+	                </div>
+	                <div class="flex-1 w-full text-center">
+	                    <label for="filterSymbol" class="text-s text-gray-400 text-center">Símbolo</label>
+	                    <input type="text" id="filterSymbol" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-sm uppercase focus:border-green-500 focus:ring-1 focus:ring-green-500">
+	                </div>
+	                <div class="flex-1 w-full text-center">
+	                    <label class="block text-sm font-medium text-gray-200 md:text-gray-700">ㅤ</label>
+	                    <button onclick="applyFilters()" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg  transition duration-300">
+	                        Aplicar Filtros
+	                    </button>
+	                </div>    
+	            </div>
+	            
+	
+	            <div id="resultsTableContainer" class="mt-4 overflow-x-auto">
+	                <table id="tradingTable" class="min-w-full divide-y divide-gray-600">
+	                    <thead class="bg-gray-600 gap-1">
+	                        <tr>
+	                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+	                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Símbolo</th>
+	                            <th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Apalancamiento</th>
+								<th class="px-3 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Tipo</th>
+	                            <th class="px-3 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Profit ($)</th>
+	                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody id="tableBody" class="bg-gray-800 divide-y divide-gray-700">
+	                        <!-- Las filas de datos se insertarán aquí con JavaScript -->
+	                    </tbody>
+	                </table>
+	            </div>
+	            <div id="totalProfitContainer" class="mt-4 text-right font-bold text-lg">
+	                <!-- El total se mostrará aquí -->
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <!-- Modal de confirmación para eliminar -->
+	    <div id="deleteModal" class="modal-overlay">
+	        <div class="modal">
+	            <h3 class="text-xl font-bold mb-4">Confirmar Eliminación</h3>
+	            <p>¿Estás seguro de que deseas eliminar esta operación?</p>
+	            <div class="modal-buttons">
+	                <button id="confirmDeleteBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-300">Eliminar</button>
+	                <button id="cancelDeleteBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg transition duration-300">Cancelar</button>
+	            </div>
+	        </div>
+	    </div>
+		
+	</div>
+	
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 			const longBtn = document.getElementById('longBtn');
@@ -672,3 +747,4 @@
     </script>
 </body>
 </html>
+
